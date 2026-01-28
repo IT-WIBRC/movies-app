@@ -1,0 +1,17 @@
+const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const TABLE_ID = import.meta.env.VITE_APPWRITE_TABLE_ID;
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const APPWRITE_ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const POSTER_BASE_URL = import.meta.env.VITE_BASE_POSTER_URL;
+
+export {
+  PROJECT_ID,
+  DATABASE_ID,
+  TABLE_ID,
+  TMDB_API_KEY,
+  API_BASE_URL,
+  POSTER_BASE_URL,
+  APPWRITE_ENDPOINT,
+};
