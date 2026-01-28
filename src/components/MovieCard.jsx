@@ -11,7 +11,6 @@ const MovieCard = ({ movie }) => {
         src={
           poster_path ? `${POSTER_BASE_URL}/${poster_path}` : "/no-movie.png"
         }
-        fetchPriority="loading"
         alt={title}
       />
       <h3>{title}</h3>

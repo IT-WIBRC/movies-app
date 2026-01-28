@@ -10,12 +10,14 @@ import { API_OPTIONS } from "./api/config";
 function App() {
   /*
     TODO: Check how it behaves when there is no internet connection
-    TODO: Check if there are way sto improve it using other hoots (useMemo, useTransition)
+    TODO: Enhance the image loading display
+    TODO: Check if there are way stop improve it using other hooks (useMemo, useTransition)
     TODO:  Check if it's not preferable to use Map/Set instead of an array
     TODO: Use toast lib to manage error messages
     TODO: Add unit tests for this project too
     TODO: Add a detail page too using router
     TODO: Migrate to Typescript
+    ! TODO: Create a Netlify function to avoid exposing my environment variables in the request and remove the `SECRETS_SCAN_ENABLED=true` in the env files
   */
   const [searchItem, setSearchItem] = useState("");
   const [trendingMovies, setTrendingMovies] = useState([]);
