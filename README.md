@@ -14,6 +14,8 @@
   <h3 align="center">A Real-world Movie App with React, TailwindCss and Appwrite</h3>
 </div>
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/00c33bbc-d2ae-42ed-a1c6-5e478ba4593e/deploy-status)](https://app.netlify.com/projects/movie-ges/deploys)
+
 ## 📋 <a name="table">Table of Contents</a>
 
 1. 🤖 [Introduction](#introduction)
@@ -74,10 +76,20 @@ bun install
 Create a new file named `.env` in the root of your project and add the following content:
 
 ```env
-VITE_TMDB_API_KEY=your_tmdb_api_key
-VITE_APPWRITE_PROJECT_ID=your_appwrite_project_id
-VITE_APPWRITE_DATABASE_ID=your_appwrite_database_id
-VITE_APPWRITE_COLLECTION_ID=your_appwrite_collection_id
+VITE_TMDB_API_KEY=
+VITE_API_BASE_URL=
+
+VITE_APPWRITE_DATABASE_ID=
+VITE_APPWRITE_TABLE_ID=
+
+VITE_APPWRITE_PROJECT_ID =
+VITE_APPWRITE_PROJECT_NAME =
+VITE_APPWRITE_ENDPOINT =
+
+
+VITE_BASE_POSTER_URL=
+
+VITE_NETLIFY_FUNCTIONS_BASE_URL=http://localhost:8888/.netlify/functions
 ```
 
 Replace the placeholder values with your actual TMDB and Appwrite credentials.
@@ -85,10 +97,10 @@ Replace the placeholder values with your actual TMDB and Appwrite credentials.
 **Running the Project**
 
 ```bash
-bun run dev
+bun run serve
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser to view the project.
+Open [http://localhost:8888](http://localhost:8888) in your browser to view the project.
 
 ## Preview
 
