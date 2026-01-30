@@ -85,10 +85,10 @@ Replace the placeholder values with your actual TMDB and Appwrite credentials.
 **Running the Project**
 
 ```bash
-bun run dev
+bunx netlify dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser to view the project.
+Open [http://localhost:8888](http://localhost:8888) in your browser to view the project.
 
 ## Preview
 
