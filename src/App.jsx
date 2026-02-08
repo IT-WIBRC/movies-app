@@ -3,22 +3,12 @@ import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 import { useState, useEffect } from "react";
 import useDebounce from "./hooks/useDebounce";
-import { getTrendingMovies, updateSearchCount } from "./api/appwrite";
-import { API_BASE_URL } from "./api/constant";
-import { API_OPTIONS } from "./api/config";
+import { GET_OPTIONS } from "./api/config";
+import { NETLIFY_FUNCTIONS_BASE_URL } from "./api/constant";
+import { getTrendingMovies, processGettingMovies } from "./api/movies";
+import { TrendingMovie } from "./components/TrendingMovie";
 
 function App() {
-  /*
-    TODO: Check how it behaves when there is no internet connection
-    TODO: Enhance the image loading display
-    TODO: Check if there are way stop improve it using other hooks (useMemo, useTransition)
-    TODO:  Check if it's not preferable to use Map/Set instead of an array
-    TODO: Use toast lib to manage error messages
-    TODO: Add unit tests for this project too
-    TODO: Add a detail page too using router
-    TODO: Migrate to Typescript
-    ! TODO: Create a Netlify function to avoid exposing my environment variables in the request and remove the `SECRETS_SCAN_ENABLED=true` in the env files
-  */
   const [searchItem, setSearchItem] = useState("");
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [movieList, setMovieList] = useState([]);
@@ -26,60 +16,48 @@ function App() {
   const [isMovieListLoading, setIsMovieListLoading] = useState(false);
   const debouncedSearchTerm = useDebounce(searchItem, 1000);
 
-  const fetchMovies = async (query = "") => {
-    setIsMovieListLoading(true);
-    setErrorMessage("");
-    try {
-      const endpoint = query
-        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
-
-      const response = await fetch(endpoint, API_OPTIONS);
-      if (!response.ok) {
-        throw Error("Failed to fetch movies");
-      }
-      const data = await response.json();
-
-      // TODO: Double check this line as it might be wrong
-      if (data.Response === "False") {
-        setErrorMessage(data.Error || "Failed to fetch movies.");
-        setMovieList([]);
-        return;
-      }
-      setMovieList(data.results || []);
-
-      if (query && data.results.length > 0) {
-        const movie = data.results[0];
-        await updateSearchCount(query, movie.id, movie.poster_path);
-      }
-    } catch (error) {
-      console.error("Error while fetching movies: ", error);
-      setErrorMessage("Error while fetching movies. Please try again");
-    } finally {
-      setIsMovieListLoading(false);
-    }
-  };
-
-  const loadTrendingMovies = async () => {
-    try {
-      const movies = await getTrendingMovies();
-      setTrendingMovies(movies);
-    } catch (error) {
-      console.error(error);
-      // TODO: Manage this error too
-    }
-  };
-
   useEffect(() => {
+    const controller = new AbortController();
+    const fetchMovies = async (query = "") => {
+      setIsMovieListLoading(true);
+      setErrorMessage("");
+      try {
+        const movies = await processGettingMovies(query, controller.signal);
+        setMovieList(() => movies ?? []);
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        setErrorMessage("Error while fetching movies. Please try again");
+        console.error("Error while fetching movies: ", error);
+      } finally {
+        setIsMovieListLoading(false);
+      }
+    };
+
     fetchMovies(debouncedSearchTerm);
+
+    return () => controller.abort();
   }, [debouncedSearchTerm]);
 
   useEffect(() => {
+    const controllerTrending = new AbortController();
+    const loadTrendingMovies = async () => {
+      try {
+        const movies = await getTrendingMovies(controllerTrending.signal);
+        setTrendingMovies(movies);
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        console.error(error);
+        // TODO: Manage this error too
+      }
+    };
+
     loadTrendingMovies();
+
+    return () => controllerTrending.abort();
   }, []);
 
   return (
-    <main>
+    <main className="flex flex-col">
       <div className="pattern" />
       <div className="wrapper">
         <header>
@@ -89,28 +67,29 @@ function App() {
             Without the Hassle
           </h1>
           <Search searchItem={searchItem} setSearchItem={setSearchItem} />
-          {/* TODO: Bug when we click on the search cross to delete the search content */}
         </header>
 
         {trendingMovies.length > 0 && (
           <section className="trending">
             <h2>Trending</h2>
             <ul>
-              {trendingMovies.map((trendingMovie, index) => (
-                <li key={trendingMovie.movie_id}>
-                  <p>{index + 1}</p>
-                  <img src={trendingMovie.poster_url} alt="Trending movie" />
-                </li>
+              {trendingMovies.map(({ movie_id, poster_url }, index) => (
+                <TrendingMovie
+                  key={movie_id}
+                  posterUrl={poster_url}
+                  index={index}
+                />
               ))}
             </ul>
           </section>
         )}
 
-        <section className="all-movies">
+        <section className="all-movies grow h-full flex flex-col">
           <h2 className="mt-10">All movies</h2>
           {isMovieListLoading ? (
-            //* Should be centered in the content and bigger
-            <Spinner />
+            <div className="flex justify-center items-center grow h-full">
+              <Spinner />
+            </div>
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
           ) : (
