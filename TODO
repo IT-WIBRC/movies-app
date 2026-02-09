@@ -4,8 +4,8 @@
 [x] Add the abort controller on request
 [ ] Add commitlint and linter check and github ci
 [ ] Check if there are way stop improve it using other hooks (useMemo, useTransition)
-[ ] Have a skeleton loading for trending too and adjust it to use ir for movies
-[ ] Use toast lib to manage error messages
+[x] Have a skeleton loading for trending too and adjust it to use it for movies
+[x] Use toast lib to manage error messages
 [ ] Add unit tests for this project too and update the github ci
 [ ] Add a detail page too using router
 [ ] Migrate to Typescript
