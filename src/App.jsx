@@ -1,77 +1,56 @@
+import {
+  useState,
+  useEffect,
+  useTransition,
+  useActionState,
+  Suspense,
+} from "react";
+import { ToastContainer, toast } from "react-toastify";
 import Search from "./components/Search";
-import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
-import { useState, useEffect } from "react";
-import useDebounce from "./hooks/useDebounce";
-import { GET_OPTIONS } from "./api/config";
-import { NETLIFY_FUNCTIONS_BASE_URL } from "./api/constant";
 import { getTrendingMovies, processGettingMovies } from "./api/movies";
 import { TrendingMovie } from "./components/TrendingMovie";
 import NoData from "./components/NoData";
-import { ToastContainer, toast } from "react-toastify";
 import MovieCardSkeleton from "./components/skeletons/MovieCardSkeleton";
 import TrendingSkeleton from "./components/skeletons/TrendingSkeleton";
+import useDebounce from "./hooks/useDebounce";
+import TrendingList from "./components/TrendingList";
+
+async function fetchMoviesAction(prevState, query) {
+  try {
+    const movies = await processGettingMovies(query);
+    return { movies: movies ?? [], error: null };
+  } catch (error) {
+    toast.error("Failed to fetch movies.");
+    console.error(error);
+    return { movies: [...prevState.movies], error: "Network Error" };
+  }
+}
+
+const trendingPromise = getTrendingMovies();
 
 function App() {
   const [searchItem, setSearchItem] = useState("");
-
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [movieList, setMovieList] = useState([]);
-
-  const [isMovieListLoading, setIsMovieListLoading] = useState(false);
-  const [areTrendingMoviesLoading, setAreTrendingMoviesLoading] =
-    useState(false);
-
+  const [isPending, startTransition] = useTransition();
   const debouncedSearchTerm = useDebounce(searchItem, 1000);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const fetchMovies = async (query = "") => {
-      setIsMovieListLoading(true);
-      try {
-        const movies = await processGettingMovies(query, controller.signal);
-        setMovieList(() => movies ?? []);
-      } catch (error) {
-        if (error.name === "AbortError") return;
-        toast.error("Error while fetching movies. Please try again");
-        console.error("Error while fetching movies: ", error);
-      } finally {
-        setIsMovieListLoading(false);
-      }
-    };
-
-    fetchMovies(debouncedSearchTerm);
-
-    return () => controller.abort();
-  }, [debouncedSearchTerm]);
+  const [state, submitSearch, isSearching] = useActionState(fetchMoviesAction, {
+    movies: [],
+    error: null,
+  });
 
   useEffect(() => {
-    const controllerTrending = new AbortController();
-    const loadTrendingMovies = async () => {
-      try {
-        setAreTrendingMoviesLoading(true);
-        const movies = await getTrendingMovies(controllerTrending.signal);
-        setTrendingMovies(movies);
-      } catch (error) {
-        if (error.name === "AbortError") return;
-        toast.error("Impossible to find they list of movies. Please try again");
-        console.error(error);
-      } finally {
-        setAreTrendingMoviesLoading(false);
-      }
-    };
-
-    loadTrendingMovies();
-
-    return () => controllerTrending.abort();
-  }, []);
+    startTransition(() => {
+      submitSearch(debouncedSearchTerm);
+    });
+  }, [debouncedSearchTerm, submitSearch]);
 
   return (
     <main className="flex flex-col">
       <div className="pattern" />
       <div className="wrapper">
         <header>
-          <img src="/hero.png" alt="Popular movies images" />
+          <img src="/hero.png" alt="Popular movies" />
           <h1>
             Find <span className="text-gradient">Movies</span> You'll Enjoy
             Without the Hassle
@@ -81,49 +60,42 @@ function App() {
 
         <section className="trending">
           <h2>Trending</h2>
-          {!areTrendingMoviesLoading && trendingMovies.length === 0 ? (
-            <NoData text="No trending movies yet" />
-          ) : areTrendingMoviesLoading ? (
-            <ul className="mt-10">
-              {[1, 2, 3, 4].map((n) => (
-                <TrendingSkeleton key={n} />
-              ))}
-            </ul>
-          ) : (
-            <ul>
-              {trendingMovies.map(({ movie_id, poster_url }, index) => (
-                <TrendingMovie
-                  key={movie_id}
-                  posterUrl={poster_url}
-                  index={index}
-                />
-              ))}
-            </ul>
-          )}
+          <Suspense
+            fallback={
+              <ul className="mt-10">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <TrendingSkeleton key={n} />
+                ))}
+              </ul>
+            }
+          >
+            <TrendingList promise={trendingPromise} />
+          </Suspense>
         </section>
 
         <section className="all-movies grow h-full flex flex-col">
           <h2 className="mt-10">All movies</h2>
-          {!isMovieListLoading && movieList.length === 0 ? (
-            <NoData text="No movies found" />
-          ) : (
-            <ul>
-              {isMovieListLoading
-                ? [1, 2, 3, 4].map((n) => <MovieCardSkeleton key={n} />)
-                : movieList.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie} />
-                  ))}
-            </ul>
-          )}
+
+          <div
+            className="transition-opacity duration-300"
+            style={{ opacity: isSearching || isPending ? 0.6 : 1 }}
+          >
+            {!isSearching && state.movies.length === 0 ? (
+              <NoData text="No movies found" />
+            ) : (
+              <ul>
+                {isSearching && state.movies.length === 0
+                  ? [1, 2, 3, 4, 8].map((n) => <MovieCardSkeleton key={n} />)
+                  : state.movies.map((movie) => (
+                      <MovieCard key={movie.id} movie={movie} />
+                    ))}
+              </ul>
+            )}
+          </div>
         </section>
       </div>
-      <ToastContainer
-        position="top-right"
-        closeOnClick
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
+
+      <ToastContainer position="top-right" theme="dark" />
     </main>
   );
 }
