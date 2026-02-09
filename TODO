@@ -2,7 +2,7 @@
 
 [ ] Check how it behaves when there is no internet connection
 [x] Add the abort controller on request
-[ ] Add commitlint and linter check and github ci
+[x] Add commitlint and linter check and github ci
 [x] Check if there are way stop improve it using other hooks (useMemo, useTransition, use, Suspense)
 [x] Have a skeleton loading for trending too and adjust it to use it for movies
 [x] Use toast lib to manage error messages
