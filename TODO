@@ -1,14 +1,15 @@
 # TODO
 
-[ ] Check how it behaves when there is no internet connection
-[x] Add the abort controller on request
-[x] Add commitlint and linter check and github ci
-[x] Check if there are way stop improve it using other hooks (useMemo, useTransition, use, Suspense)
-[x] Have a skeleton loading for trending too and adjust it to use it for movies
-[x] Use toast lib to manage error messages
-[x] Add unit tests for this project too and update the github ci
-[ ] Add a detail page too using router
-[ ] Migrate to Typescript
-[ ] Enhance the image loading display
-[ ] Use Internationalization
-[x] Create a Netlify function to avoid exposing my environment variables in the request and remove the `SECRETS_SCAN_ENABLED=true` in the env files. Change `NETLIFY_FUNCTIONS_BASE_URL` to the online app base url
+- [ ] Check how it behaves when there is no internet connection
+- [x] Add the abort controller on request
+- [x] Add commitlint and linter check and github ci
+- [x] Check if there are way stop improve it using other hooks (useMemo, useTransition, use, Suspense)
+- [x] Have a skeleton loading for trending too and adjust it to use it for movies
+- [x] Use toast lib to manage error messages
+- [x] Add unit tests for this project too and update the github ci
+- [x] Document the choice of netlify function, The choice of hooks I used, Decision for commit message conventions, List of Done task at the end in the readme or a link to the TODO
+- [x] Create a Netlify function to avoid exposing my environment variables in the request and remove the `SECRETS_SCAN_ENABLED=true` in the env files. Change `NETLIFY_FUNCTIONS_BASE_URL` to the online app base url
+- [ ] Add a detail page too using router
+- [ ] Migrate to Typescript
+- [ ] Enhance the image loading display
+- [ ] Use Internationalization
