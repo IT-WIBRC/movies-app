@@ -6,7 +6,7 @@ const MovieCard = ({ movie }) => {
     movie;
 
   return (
-    <li className="movie-card">
+    <li className="movie-card" data-testid="card-item">
       <img
         src={
           poster_path ? `${POSTER_BASE_URL}/${poster_path}` : "/no-movie.png"
@@ -16,8 +16,10 @@ const MovieCard = ({ movie }) => {
       <h3>{title}</h3>
       <div className="content">
         <div className="rating">
-          <img src="/star.svg" />
-          <p>{vote_average ? vote_average.toFixed(1) : "NN/A"}</p>
+          <img src="/star.svg" alt={`star from ${title}`} />
+          <p data-testid="rating">
+            {vote_average ? vote_average.toFixed(1) : "NN/A"}
+          </p>
         </div>
         <span>•</span>
         <p className="lang">{original_language}</p>

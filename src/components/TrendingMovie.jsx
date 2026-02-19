@@ -1,6 +1,6 @@
-export const TrendingMovie = ({ posterUrl, index }) => {
+export default function TrendingMovie({ posterUrl, index }) {
   return (
-    <li>
+    <li data-testid="trending-item">
       <p>{index + 1}</p>
       <img
         src={
@@ -8,8 +8,8 @@ export const TrendingMovie = ({ posterUrl, index }) => {
             ? posterUrl
             : "/no-movie.png"
         }
-        alt="Trending movie"
+        alt={"Trending movie " + (index + 1)}
       />
     </li>
   );
-};
+}

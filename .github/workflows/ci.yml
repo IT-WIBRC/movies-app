@@ -1,15 +1,13 @@
 name: CI
 
 on:
-  push:
-    branches-ignore:
-      - "master"
   pull_request:
     branches:
       - "master"
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   commitlint:
@@ -23,7 +21,7 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install commitlint
+      - name: Install dependencies
         run: bun install
 
       - name: Print versions
@@ -34,10 +32,17 @@ jobs:
       - name: Linter check
         run: bun run lint
 
-      - name: Validate current commit (last commit) with commitlint
-        if: github.event_name == 'push'
-        run: bunx commitlint --last --verbose
+      - name: Lint Commit Messages
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: "commitlint.config.mjs"
+          failOnWarnings: true
 
-      - name: Validate PR commits with commitlint
-        if: github.event_name == 'pull_request'
-        run: bunx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - name: Unit tests
+        run: bun run test:unit:coverage
+
+      - name: ☂️ Coverage Report
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: "./coverage/coverage-summary.json"
+          json-final-path: "./coverage/coverage-final.json"

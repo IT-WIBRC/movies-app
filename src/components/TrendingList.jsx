@@ -1,6 +1,6 @@
 import { use } from "react";
 import NoData from "./NoData";
-import { TrendingMovie } from "./TrendingMovie";
+import TrendingMovie from "./TrendingMovie";
 
 const TrendingList = ({ promise }) => {
   const movies = use(promise);
@@ -9,7 +9,7 @@ const TrendingList = ({ promise }) => {
     return <NoData text="No trending movies yet" />;
 
   return (
-    <ul>
+    <ul data-testid="movies">
       {movies.map(({ movie_id, poster_url }, index) => (
         <TrendingMovie key={movie_id} posterUrl={poster_url} index={index} />
       ))}

@@ -1,6 +1,6 @@
 function Search({ searchItem, setSearchItem }) {
   return (
-    <div className="search">
+    <div className="search" data-testid="search-bar">
       <label htmlFor="search">
         <img src="/search.svg" alt="Search icon" />
         <input
